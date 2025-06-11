@@ -1,13 +1,43 @@
 import streamlit as st
 
 st.set_page_config(page_title="스페인의 역사", layout="wide")
+st.title("🇪🇸 스페인의 역사 (고화질 이미지 포함)")
 
-st.title("🇪🇸 스페인의 역사")
-st.markdown("""
-스페인은 수천 년의 역사를 지닌 유럽의 중요한 국가 중 하나입니다. 아래는 시대별로 정리한 스페인의 역사입니다.
-""")
+# 첫 이미지는 알함브라 궁전
+st.image("https://.../alhambra_highres.jpg", caption="알함브라 궁전 – 이슬람 건축의 정수", use_column_width=True)
 
-st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Flag_of_Spain.svg/320px-Flag_of_Spain.svg.png", width=200, caption="스페인 국기")
+period = st.sidebar.radio("시대 선택", ["전체", "선사시대와 고대", "중세 시대", "근세 시대", "근대와 현대"])
+
+def show_prehistory():
+    st.header("🦴 선사시대와 고대")
+    st.image("https://.../roman_ruins_spain.jpg", caption="로마 시대 유적 – 히스파니아", use_column_width=True)
+    st.markdown("""
+    ...
+    """)
+
+def show_medieval():
+    st.header("🏰 중세 시대")
+    st.image("https://.../alhambra_highres.jpg", caption="알함브라 궁전", use_column_width=True)
+    st.markdown("""
+    ...
+    """)
+
+def show_early_modern():
+    st.header("⚓ 근세 시대")
+    st.image("https://.../columbus_painting.jpg", caption="크리스토퍼 콜럼버스", use_column_width=True)
+    st.markdown("""
+    ...
+    """)
+
+def show_modern():
+    st.header("🛠️ 근대와 현대")
+    st.image("https://.../spanish_civil_war_photo.jpg", caption="스페인 내전 현장", use_column_width=True)
+    st.markdown("""
+    ...
+    """)
+
+# 화면 출력
+# (이전과 동일)
 
 # 사이드바: 시대 선택
 period = st.sidebar.radio("시대 선택", ["전체", "선사시대와 고대", "중세 시대", "근세 시대", "근대와 현대"])
