@@ -1,238 +1,145 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
-# 목표 대학/학과 점수 데이터 (간략화 가능, 필요하면 더 추가해줘)
+# ----------------------------
+# 1. 목표 대학-학과별 내신 합격선 데이터 (예시)
 goal_db = {
     "서울대": {
         "컴퓨터공학과": 95,
-        "의예과": 98,
+        "의예과": 97,
         "경영학과": 92,
-        "심리학과": 90,
-        "전자공학과": 93,
-        "간호학과": 89,
-        "경제학과": 91,
-        "법학과": 92
+        "심리학과": 90
     },
     "성균관대": {
         "컴퓨터공학과": 90,
         "의예과": 93,
         "경영학과": 88,
-        "심리학과": 85,
-        "전자공학과": 87,
-        "간호학과": 83,
-        "경제학과": 86,
-        "법학과": 87
+        "심리학과": 85
     },
-    # ... (중략) 다른 대학도 포함
     "이화여대": {
         "컴퓨터공학과": 85,
         "간호학과": 90,
         "경영학과": 82,
-        "심리학과": 88,
-        "전자공학과": 83,
-        "경제학과": 80,
-        "법학과": 81
-    },
-    "숙명여대": {
-        "컴퓨터공학과": 80,
-        "경영학과": 78,
-        "심리학과": 75,
-        "간호학과": 79,
-        "전자공학과": 77,
-        "경제학과": 74,
-        "법학과": 76
-    },
-    "건국대": {
-        "컴퓨터공학과": 83,
-        "경영학과": 79,
-        "심리학과": 76,
-        "전자공학과": 80,
-        "간호학과": 75,
-        "경제학과": 77,
-        "법학과": 78
-    },
-    "홍익대": {
-        "컴퓨터공학과": 81,
-        "경영학과": 78,
-        "심리학과": 74,
-        "전자공학과": 79,
-        "간호학과": 73,
-        "경제학과": 75,
-        "법학과": 76
+        "심리학과": 88
     }
 }
 
-# 학과별 중요 과목 및 추천 선택과목
-major_subjects = {
-    "컴퓨터공학과": {
-        "중요과목": ["수학", "과학(물리)"],
-        "추천선택과목": ["과학탐구(물리Ⅰ)", "과학탐구(정보과학)"]
-    },
-    "의예과": {
-        "중요과목": ["과학(생물, 화학)", "수학"],
-        "추천선택과목": ["과학탐구(생물Ⅰ)", "과학탐구(화학Ⅰ)"]
-    },
-    "경영학과": {
-        "중요과목": ["수학", "사회(경제)"],
-        "추천선택과목": ["사회탐구(경제)", "사회탐구(법과정치)"]
-    },
-    "심리학과": {
-        "중요과목": ["과학(생물)", "사회(사회문화)"],
-        "추천선택과목": ["과학탐구(생물Ⅰ)", "사회탐구(사회문화)"]
-    },
-    "전자공학과": {
-        "중요과목": ["수학", "과학(물리)"],
-        "추천선택과목": ["과학탐구(물리Ⅰ)", "과학탐구(화학Ⅰ)"]
-    },
-    "간호학과": {
-        "중요과목": ["과학(생물)", "수학"],
-        "추천선택과목": ["과학탐구(생물Ⅰ)", "과학탐구(화학Ⅰ)"]
-    },
+# 2. 과목별 평균 내신 점수 (예시)
+subject_averages = {
+    "국어": 80,
+    "수학": 78,
+    "영어": 82,
+    "과학": 75,
+    "사회": 77
 }
 
-# 샘플 데이터 생성 (모델 학습용)
-def load_sample_data():
-    np.random.seed(0)
-    study_time = np.random.normal(2.5, 1.0, 100)
-    sleep_time = np.random.normal(7.0, 1.0, 100)
-    focus_level = np.random.randint(2, 6, 100)
-    assignment = np.random.uniform(50, 100, 100)
-    phone_use = np.random.uniform(1, 5, 100)
-    interest = np.random.randint(1, 6, 100)
+# ----------------------------
+st.title("📊 내신 성적 분석 & 목표 대학 내신 비교")
 
-    score = (
-        10 * study_time +
-        3 * focus_level +
-        0.5 * assignment -
-        4 * phone_use +
-        2 * interest +
-        np.random.normal(0, 5, 100)
-    )
-    data = pd.DataFrame({
-        'Study Time': study_time,
-        'Sleep Time': sleep_time,
-        'Focus Level': focus_level,
-        'Assignment Completion (%)': assignment,
-        'Phone Use Time': phone_use,
-        'Interest Level': interest,
-        'Score': score
-    })
-    return data
-
-def train_model(data):
-    features = ['Study Time', 'Sleep Time', 'Focus Level', 'Assignment Completion (%)', 'Phone Use Time', 'Interest Level']
-    X = data[features]
-    y = data['Score']
-    model = LinearRegression()
-    model.fit(X, y)
-    return model
-
-def give_feedback(study, sleep, focus, assignment, phone_use, interest):
-    feedback = []
-    if study < 2:
-        feedback.append("📌 공부 시간이 부족해요. 하루 2시간 이상 추천해요.")
-    if sleep < 6:
-        feedback.append("💤 수면 시간이 너무 적어요. 최소 6시간은 자야 집중력이 유지돼요.")
-    if focus < 3:
-        feedback.append("👀 수업 집중도를 높이면 학습 효율이 올라가요.")
-    if assignment < 70:
-        feedback.append("📎 과제 수행률이 낮아요. 꼼꼼히 챙겨보는 게 좋아요.")
-    if phone_use > 3:
-        feedback.append("📱 핸드폰 사용 시간이 너무 많아요. 공부 시간에 집중하세요.")
-    if interest < 3:
-        feedback.append("🤔 과목에 대한 흥미도가 낮네요. 흥미를 가지려고 노력해보세요.")
-    if not feedback:
-        feedback.append("✅ 전반적으로 좋은 습관이에요! 이대로만 계속 가자!")
-    return feedback
-
-# 스트림릿 앱 시작
-st.title("📚 성적 예측 & 진로 상담 웹앱")
-st.markdown("공부 습관, 지난 학기 성적, 목표 대학/학과 입력 후 맞춤 피드백과 진학 가능성을 확인해보세요!")
-
-# 1. 지난 학기 성적 입력
-st.header("📚 지난 학기 성적 입력하기")
+# 학기 및 과목 설정
 semesters = ["1학기", "2학기", "3학기", "4학기"]
-subjects = ["국어", "수학", "영어", "과학", "사회"]
+subjects = list(subject_averages.keys())
+
+# 사용자 내신 점수 입력
+st.header("📥 학기별 과목별 내신 점수 입력 (0~100)")
 
 score_data = {}
 for sem in semesters:
-    st.subheader(f"{sem} 성적 입력")
+    st.subheader(f"{sem} 내신 점수 입력")
     scores = {}
     for subj in subjects:
-        score = st.number_input(f"{sem} {subj} 성적 (0~100)", min_value=0, max_value=100, value=80, key=f"{sem}_{subj}")
-        scores[subj] = score
+        val = st.number_input(f"{sem} {subj} 성적", min_value=0, max_value=100, value=0, key=f"{sem}_{subj}")
+        scores[subj] = val
     score_data[sem] = scores
 
+# 데이터프레임 변환
 df_scores = pd.DataFrame(score_data).T
 
-st.subheader("📈 학기별 과목별 성적 그래프")
-fig, ax = plt.subplots(figsize=(10, 5))
+# 상대 점수 계산 함수
+def calculate_relative_scores(user_scores, subject_avg):
+    relative = {}
+    for subj, score in user_scores.items():
+        avg = subject_avg.get(subj, 75)
+        relative[subj] = score - avg
+    return relative
+
+# 학기별 상대 점수 데이터프레임 만들기
+df_relative = df_scores.apply(lambda row: calculate_relative_scores(row, subject_averages), axis=1, result_type='expand')
+
+# 시각화: 학기별 과목별 내신 점수 추이
+st.subheader("📈 학기별 과목별 내신 점수 변화 추이")
+fig, ax = plt.subplots(figsize=(10, 6))
 for subj in subjects:
     ax.plot(df_scores.index, df_scores[subj], marker='o', label=subj)
 ax.set_ylim(0, 100)
-ax.set_ylabel("성적")
-ax.set_title("학기별 과목별 성적 추이")
+ax.set_ylabel("내신 점수")
+ax.set_title("학기별 과목별 내신 점수 추이")
 ax.legend()
 st.pyplot(fig)
 
-# 2. 공부 습관 입력
-st.header("📥 공부 습관 입력하기")
-study_time = st.slider("하루 평균 공부 시간 (시간)", 0.0, 8.0, 2.0, 0.5)
-sleep_time = st.slider("하루 평균 수면 시간 (시간)", 0.0, 10.0, 7.0, 0.5)
-focus = st.slider("수업 집중도 (1~5)", 1, 5, 3)
-assignment = st.slider("과제 수행률 (%)", 0, 100, 80)
-phone_use = st.slider("하루 핸드폰 사용 시간 (시간)", 0.0, 10.0, 2.0, 0.5)
-interest = st.slider("과목에 대한 흥미도 (1~5)", 1, 5, 3)
+# 상대 점수 표 보여주기
+st.subheader("📊 학기별 과목별 상대 점수 (평균 대비 차이)")
+st.dataframe(df_relative)
 
-input_data = pd.DataFrame([{
-    'Study Time': study_time,
-    'Sleep Time': sleep_time,
-    'Focus Level': focus,
-    'Assignment Completion (%)': assignment,
-    'Phone Use Time': phone_use,
-    'Interest Level': interest
-}])
+# 목표 대학/학과 선택
+st.header("🎯 목표 대학 및 학과 내신 합격선 비교")
+goal_univ = st.selectbox("목표 대학 선택", options=list(goal_db.keys()))
+goal_major = st.selectbox("목표 학과 선택", options=list(goal_db[goal_univ].keys()))
 
-# 3. 목표 대학/학과 입력
-st.header("🎯 목표 대학 및 학과 입력하기")
-goal_univ = st.text_input("목표 대학을 입력하세요 (예: 서울대)")
-goal_major = st.text_input("목표 학과를 입력하세요 (예: 컴퓨터공학과)")
+required_score = goal_db[goal_univ][goal_major]
 
-# 4. 모델 학습 및 예측
-data = load_sample_data()
-model = train_model(data)
-predicted_score = model.predict(input_data)[0]
+# 평균 내신 점수 (4학기 평균)
+avg_score = df_scores.mean().mean()
 
-st.header("📊 예측 결과")
-st.success(f"예상 성적: **{predicted_score:.2f}점**")
+st.write(f"목표 대학: **{goal_univ}**, 학과: **{goal_major}**")
+st.write(f"목표 내신 합격선 점수 (예시): **{required_score}점**")
+st.write(f"입력한 내신 평균 점수: **{avg_score:.2f}점**")
 
-# 5. 피드백 메시지
-st.subheader("🗒️ 맞춤 피드백")
-for msg in give_feedback(study_time, sleep_time, focus, assignment, phone_use, interest):
-    st.write(msg)
+# 5단계 차이에 따른 맞춤 조언
+diff = avg_score - required_score
 
-# 6. 목표 대학/학과 진학 가능성 판단
-st.subheader("🎯 목표 대학/학과 진학 가능성")
-required_score = None
-if goal_univ and goal_major:
-    required_score = goal_db.get(goal_univ.strip(), {}).get(goal_major.strip())
-    if required_score:
-        if predicted_score >= required_score:
-            st.success(f"🎉 {goal_univ} {goal_major} 진학 가능성이 높아요! (필요 점수: {required_score})")
-        else:
-            st.warning(f"📉 {goal_univ} {goal_major} 진학을 위해 점수가 더 필요해요! (필요: {required_score}, 예측: {predicted_score:.2f})")
-    else:
-        st.info("해당 대학/학과 정보가 없습니다.")
+if diff >= 10:
+    st.success("🎉 내신 점수가 목표 합격선보다 매우 높습니다! 합격이 확실합니다!")
+    st.write("✅ 추천 조언:")
+    st.write("1. 현재 학습 방법을 꾸준히 유지하세요.")
+    st.write("2. 심화 과목 및 선택과목에서도 우수한 성적을 유지하세요.")
+    st.write("3. 모의고사 대비도 게을리 하지 마세요.")
+    st.write("4. 동아리나 봉사활동 등 비교과 활동에도 신경 쓰세요.")
+    st.write("5. 목표 대학에 대한 자세한 입시 정보도 꾸준히 확인하세요.")
 
-# 7. 학과별 중요 과목 및 선택 과목 안내
-if goal_major:
-    st.subheader(f"📚 {goal_major} 중요 과목 및 추천 선택과목")
-    info = major_subjects.get(goal_major)
-    if info:
-        st.write("중요 과목:", ", ".join(info["중요과목"]))
-        st.write("추천 선택 과목:", ", ".join(info["추천선택과목"]))
-    else:
-        st.write("해당 학과의 중요 과목 정보가 없습니다.")
+elif 5 <= diff < 10:
+    st.success("👍 내신 점수가 목표 합격선보다 약간 높아, 합격 가능성이 높습니다.")
+    st.write("✅ 추천 조언:")
+    st.write("1. 중요한 과목에 집중하여 점수를 유지하세요.")
+    st.write("2. 최근 학기 성적 하락을 주의하세요.")
+    st.write("3. 선택과목도 신중하게 골라 내신에 반영되도록 하세요.")
+    st.write("4. 꾸준한 모의고사 준비로 실전 감각을 키우세요.")
+    st.write("5. 진로 상담이나 선생님 조언도 적극 활용하세요.")
+
+elif 0 <= diff < 5:
+    st.info("⚠️ 내신 점수가 목표 합격선과 근접합니다. 세심한 관리가 필요합니다.")
+    st.write("⚠️ 개선 조언:")
+    st.write("1. 부족한 과목을 집중 관리하세요.")
+    st.write("2. 시험 준비 계획을 세우고 실천력을 높이세요.")
+    st.write("3. 학기별 성적 변동에 민감하게 대응하세요.")
+    st.write("4. 선택과목을 전략적으로 결정하세요.")
+    st.write("5. 전문가 상담을 통해 학습 방법을 점검하세요.")
+
+elif -5 <= diff < 0:
+    st.warning("⚠️ 내신 점수가 목표 합격선보다 약간 낮습니다. 집중 보완이 필요합니다.")
+    st.write("⚠️ 집중 보완 조언:")
+    st.write("1. 약한 과목을 집중적으로 보완하는 계획을 세우세요.")
+    st.write("2. 시간 관리 및 공부 습관을 개선하세요.")
+    st.write("3. 모의고사 성적과 내신 차이를 줄이기 위해 노력하세요.")
+    st.write("4. 선택과목을 재검토해 내신 향상에 도움이 되는 과목을 선택하세요.")
+    st.write("5. 선생님, 상담사와 상담해 맞춤형 전략을 수립하세요.")
+
+else:
+    st.error("❗ 내신 점수가 목표 합격선보다 크게 낮습니다. 대책 마련이 시급합니다!")
+    st.write("❗ 긴급 대책 조언:")
+    st.write("1. 부족한 과목 위주로 학습 계획을 재구성하세요.")
+    st.write("2. 공부 시간과 방법을 근본적으로 점검하고 개선하세요.")
+    st.write("3. 학습 동기 부여를 위해 목표와 계획을 다시 설정하세요.")
+    st.write("4. 입시 전문가, 진로 상담사의 도움을 반드시 받으세요.")
+    st.write("5. 필요시 대학 선택이나 진로 계획을 재검토하는 것도 고려하세요.")
