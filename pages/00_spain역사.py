@@ -6,7 +6,7 @@ st.markdown("스페인은 유럽의 문화적, 정치적 중심지 중 하나로
 
 # 멋진 배경 이미지
 st.image("https://upload.wikimedia.org/wikipedia/commons/9/98/Alhambra_Granada_Spain.jpg", 
-         caption="알함브라 궁전 (Granada) – 이슬람 건축의 정수", use_column_width=True)
+         caption="알함브라 궁전 (Granada) – 이슬람 건축의 정수", use_container_width=True)
 
 # 사이드바: 시대 선택
 period = st.sidebar.radio("시대 선택", ["전체", "선사시대와 고대", "중세 시대", "근세 시대", "근대와 현대"])
@@ -15,7 +15,7 @@ period = st.sidebar.radio("시대 선택", ["전체", "선사시대와 고대", 
 def show_prehistory():
     st.header("🦴 선사시대와 고대")
     st.image("https://upload.wikimedia.org/wikipedia/commons/4/4f/Segovia_Aqueduct_02.jpg", 
-             caption="세고비아 로마 수도교 – 로마 제국 시기의 유산", use_column_width=True)
+             caption="세고비아 로마 수도교 – 로마 제국 시기의 유산", use_container_width=True)
     st.markdown("""
     - 이베리아인, 켈트족 등이 초기 정착함  
     - 기원전 1100년경 페니키아인과 그리스인 도착  
@@ -25,7 +25,7 @@ def show_prehistory():
 def show_medieval():
     st.header("🏰 중세 시대")
     st.image("https://upload.wikimedia.org/wikipedia/commons/1/1c/Alcazar_Segovia_Spain.jpg", 
-             caption="세고비아 알카사르 – 기독교 왕국 시대의 성채", use_column_width=True)
+             caption="세고비아 알카사르 – 기독교 왕국 시대의 성채", use_container_width=True)
     st.markdown("""
     - 5세기 서고트족이 로마 제국 붕괴 이후 지배  
     - 711년 무어인 침입 → 이슬람 문화 번성  
@@ -35,7 +35,7 @@ def show_medieval():
 def show_early_modern():
     st.header("⚓ 근세 시대")
     st.image("https://upload.wikimedia.org/wikipedia/commons/2/29/Colon_Espanol.jpg", 
-             caption="크리스토퍼 콜럼버스 – 대항해 시대의 상징", use_column_width=True)
+             caption="크리스토퍼 콜럼버스 – 대항해 시대의 상징", use_container_width=True)
     st.markdown("""
     - 카스티야와 아라곤의 통일 → 스페인 왕국 탄생  
     - 1492년 콜럼버스의 항해 → 아메리카 대륙 식민지화  
@@ -45,7 +45,7 @@ def show_early_modern():
 def show_modern():
     st.header("🛠️ 근대와 현대")
     st.image("https://upload.wikimedia.org/wikipedia/commons/f/f7/Francisco_Franco.jpg", 
-             caption="프란시스코 프랑코 – 스페인 내전과 독재 시대", use_column_width=True)
+             caption="프란시스코 프랑코 – 스페인 내전과 독재 시대", use_container_width=True)
     st.markdown("""
     - 19세기: 나폴레옹 침공 → 반도 전쟁  
     - 1936~1939년: 스페인 내전 → 프랑코 정권 수립  
